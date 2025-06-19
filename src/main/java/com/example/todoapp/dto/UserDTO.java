@@ -8,6 +8,7 @@ import lombok.NonNull;
 import java.util.UUID;
 @Builder
 @Data
+
 public class UserDTO {
     private UUID id;
     private String email;

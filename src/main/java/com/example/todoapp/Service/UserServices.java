@@ -8,5 +8,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserServices {
     ResponseEntity<UserDTO> register(UserDTO dto);
-    ResponseEntity<UserDTO> login(UserDTO dto);
+    ResponseEntity<?> login(UserDTO dto);
 }

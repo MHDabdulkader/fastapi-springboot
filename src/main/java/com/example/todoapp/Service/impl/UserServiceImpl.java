@@ -5,6 +5,7 @@ import com.example.todoapp.Repository.UsersRepo;
 import com.example.todoapp.Service.UserServices;
 import com.example.todoapp.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,10 +33,12 @@ public class UserServiceImpl implements UserServices {
         return ResponseEntity.ok(UserDTO.from(saved));
     }
     @Override
-    public ResponseEntity<UserDTO> login(UserDTO dto){
-        Users users = UserDTO.toEntity(dto);
-        Users findUser = repo.findByEmail(users.getEmail());
-
+    public ResponseEntity<?> login(UserDTO dto){
+        //Users users = UserDTO.toEntity(dto);
+        Users findUser = repo.findByEmail(dto.getEmail());
+        if(findUser == null || !passwordEncoder.matches(dto.getPassword(), findUser.getPassword())){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid authorization");
+        }
         return ResponseEntity.ok(UserDTO.from(findUser));
     }
 }

@@ -26,20 +26,28 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("register", "login").permitAll()
+                        request
+                                .requestMatchers("/api/register", "/api/login").permitAll()
+                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/api/user/**").hasRole("USER")
                                 .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults())
                 .sessionManagement(session->
                         session.sessionCreationPolicy( SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
+                .logout(logout -> logout
+                        .logoutUrl("/api/logout")
+                        .logoutSuccessUrl("/api/login?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID"))
                 .build();
     }
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
+        provider.setPasswordEncoder(passwordEncoder());
 
         return provider;
     }
